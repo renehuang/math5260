@@ -1,0 +1,25 @@
+﻿  main.cpp
+c:\coursecode\math5260\proj\main.cpp(104): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(137): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(165): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(192): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(217): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(237): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(243): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(249): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(255): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(261): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(755): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(767): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(789): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(802): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(847): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(860): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(873): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(922): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(935): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(948): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(961): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\coursecode\math5260\proj\main.cpp(1022): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+  Project1.vcxproj -> C:\coursecode\math5260\Project1\Debug\Project1.exe
+  Project1.vcxproj -> C:\coursecode\math5260\Project1\Debug\Project1.pdb (Partial PDB)

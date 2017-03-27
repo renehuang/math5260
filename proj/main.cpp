@@ -2,12 +2,13 @@
 //  Created by Paulo Becerril on 1/10/17.
 //  Copyright © 2017 Paulo Becerril. All rights reserved.
 
-
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cstring>
 #include <vector>
+#include <ctime>
 using namespace std;
 
 // If I want to start in November start=0, December start=1 ...
@@ -37,7 +38,12 @@ string trackerMatrixB_Ask[49][49];
 int totalpathsF[49][49];
 int totalpathsB[49][49];
 
-float totalprices[49][460000][49];
+// not enough memory in visual studio; using dynamic memory
+//float ***totalprices = new float**[49];
+
+
+//float totalprices[49][460000][49];
+
 
 float maxPricesF[50][49];
 float maxPricesB[50][49];
@@ -80,11 +86,15 @@ void backwards(int start, int number);
 
 int main ()
 {
+	clock_t startTime = clock();
+
     // 1: Read input files ----------------------------------------------------------------------------------------------------
     // 1.1: Outright
     streampos size;
     char * memblock;
-    ifstream file ("/Users/paulobecerril/Desktop/Pricing/Paulo/C++/PricingV2/Inputs/outright.csv", ios::in|ios::binary|ios::ate);
+//	rsize_t strmax = sizeof memblock;
+	char * next_token;
+    ifstream file ("C:/coursecode/math5260/proj/outright.csv", ios::in|ios::binary|ios::ate);
     if (file.is_open())
     {
         // Get the length of the file
@@ -99,20 +109,14 @@ int main ()
         
         // Create our array of outrights
         // We get the pointers of the beginning of each outright
-        char* chars_array = strtok(memblock, ",\n");
+        char* chars_array = strtok_s(memblock, ",\n",&next_token);
         // Copy outrights from memblock in the vector outright
         while(chars_array)
         {
             outrightF.push_back(chars_array);
             // Convert to a null character after reading
-            chars_array = strtok(NULL, ",\n");
+            chars_array = strtok_s(NULL, ",\n",&next_token);
         }
-        //cout<<"Size of vector outright "<<outrightF.size()<<endl;
-        
-        // Print some outrights
-        //for (int i=0; i<42;i++){
-        //    cout << "outrightF= " << outrightF[i] <<endl;
-        //}
     }
     else cout << "Unable to open file";
     
@@ -120,7 +124,7 @@ int main ()
     // 1.2: 1 Month
     streampos size1;
     char * memblock1;
-    ifstream file1 ("/Users/paulobecerril/Desktop/Pricing/Paulo/C++/PricingV2/Inputs/onemonth.csv", ios::in|ios::binary|ios::ate);
+    ifstream file1 ("C:/coursecode/math5260/proj/onemonth.csv", ios::in|ios::binary|ios::ate);
     if (file1.is_open())
     {
         size1 = file1.tellg();
@@ -130,25 +134,20 @@ int main ()
         file1.close();
         //cout << "one month content is in memory"<<endl;
         
-        char* chars_array = strtok(memblock1, ",\n");
+        char* chars_array = strtok_s(memblock1, ",\n",&next_token);
         while(chars_array)
         {
             onemonthF.push_back(chars_array);
-            chars_array = strtok(NULL, ",\n");
+            chars_array = strtok_s(NULL, ",\n", &next_token);
         }
-        //cout<<"Size of vector one month "<<onemonthF.size()<<endl;
-        
-        //for (int i=0; i<12;i++){
-        //cout << "one-month spread=" << onemonthF[i] <<endl;
-        //}
-    }
+	}
     else cout << "Unable to open file";
     
     
     // 1.3: 3 Months
     streampos size2;
     char * memblock2;
-    ifstream file2 ("/Users/paulobecerril/Desktop/Pricing/Paulo/C++/PricingV2/Inputs/threemonth.csv", ios::in|ios::binary|ios::ate);
+    ifstream file2 ("C:/coursecode/math5260/proj/threemonth.csv", ios::in|ios::binary|ios::ate);
     if (file2.is_open())
     {
         size2 = file2.tellg();
@@ -160,11 +159,11 @@ int main ()
         //cout << "three month content is in memory"<<endl;
         
         
-        char* chars_array = strtok(memblock2, ",\n");
+        char* chars_array = strtok_s(memblock2, ",\n", &next_token);
         while(chars_array)
         {
             threemonthF.push_back(chars_array);
-            chars_array = strtok(NULL, ",\n");
+            chars_array = strtok_s(NULL, ",\n", &next_token);
         }
         //cout<<"Size of vector three month "<<threemonthF.size()<<endl;
         
@@ -175,7 +174,7 @@ int main ()
     // 1.4: 6 Months
     streampos size3;
     char * memblock3;
-    ifstream file3 ("/Users/paulobecerril/Desktop/Pricing/Paulo/C++/PricingV2/Inputs/sixmonth.csv", ios::in|ios::binary|ios::ate);
+    ifstream file3 ("C:/coursecode/math5260/proj/sixmonth.csv", ios::in|ios::binary|ios::ate);
     if (file3.is_open())
     {
         size3 = file3.tellg();
@@ -186,11 +185,11 @@ int main ()
         //cout << memblock <<endl;
         //cout << "six month content is in memory"<<endl;
         
-        char* chars_array = strtok(memblock3, ",\n");
+        char* chars_array = strtok_s(memblock3, ",\n", &next_token);
         while(chars_array)
         {
             sixmonthF.push_back(chars_array);
-            chars_array = strtok(NULL, ",\n");
+            chars_array = strtok_s(NULL, ",\n", &next_token);
         }
         //cout<<"Size of vector six month "<<sixmonthF.size()<<endl;
     }
@@ -200,7 +199,7 @@ int main ()
     //1.5: 1 year
     streampos size4;
     char * memblock4;
-    ifstream file4 ("/Users/paulobecerril/Desktop/Pricing/Paulo/C++/PricingV2/Inputs/oneyear.csv", ios::in|ios::binary|ios::ate);
+    ifstream file4 ("C:/coursecode/math5260/proj/oneyear.csv", ios::in|ios::binary|ios::ate);
     if (file4.is_open())
     {
         size4 = file4.tellg();
@@ -211,16 +210,18 @@ int main ()
         //cout << memblock <<endl;
         //cout << "one year content is in memory"<<endl;
         
-        char* chars_array = strtok(memblock4, ",\n");
+        char* chars_array = strtok_s(memblock4, ",\n", &next_token);
         while(chars_array)
         {
             oneyearF.push_back(chars_array);
-            chars_array = strtok(NULL, ",\n");
+            chars_array = strtok_s(NULL, ",\n", &next_token);
         }
         //cout<<"Size of vector one year "<<oneyearF.size()<<endl;
     }
     else cout << "Unable to open file";
     
+
+
     // Fill Backwards Prices
     // Outright
     for(int k=0; k<sizeOutright; k++){
@@ -253,7 +254,17 @@ int main ()
     }
     
     
+	// reading time
+	clock_t readTime = clock();
+	clock_t part1_time = readTime - startTime;
+	double time_1 = part1_time / (double)CLOCKS_PER_SEC;
+	cout << "time for reading files: " << time_1 << endl;
+
+
     
+
+
+
     // 2: Initialize Matrices -------------------------------------------------------------------------------------------------
     // 2.1: Total Paths
     for (int r=0; r<number;r++){
@@ -274,87 +285,165 @@ int main ()
         }
     }
     
-    cout << "Empezamos Forwards" << endl;
-    
+    cout << "Start Calculating" << endl;
+
+
+    // the time consumption is not in the forward & backward calculation
     // 3a: Loop: for all starting months Forwards: -----------------------------------------------------------------------------
     
-    for (int j=start; j<number; j++){
-        
-        // 3.1: Create a matrix to store prices
-        matrixF = new float*[row];
-        for(int i = 0; i < row; ++i){
-            matrixF[i] = new float[col];
-        }
-        
-        // 3.2: Fill the matrix with zeros
-        for(int i=0;i<row;i++) {
-            for(int k=0;k<col;k++) {
-                matrixF[i][k]=0;
-            }
-        }
-        
-        // 3.3: Initialize the month matrix index counter
-        for (int r=0; r<number;r++){
-            monthindexF[r] = 0;
-            trackerF_Bid[r]="";
-            trackerF_Ask[r]="";
-        }
-        
-        // 3.4: Call function "constructPaths"
-        string indexF;
-        indexF=to_string(j+1);
-        
-        forwards(j,number);
-        
-        // Prueba
-        /*
-         for (int r=1; r<number;r++){
-         cout << "Start: "<< j << " Mes: " << r << " Tracker: "<< trackerV[r] << endl;
-         }
-         */
-        
-        
-        // 3.5: Fill Total Path Matrix and Tracker Matrix
-        for (int r=1; r<number;r++){
-            totalpathsF[r-1][j]=monthindexF[r];
-            if (atof(outrightF[j])>0){
-                //cout << "j: " << j << " " << outrightF[j] << endl;
-                trackerMatrixF_Bid[j][r-1]=trackerF_Bid[r];
-                trackerMatrixF_Ask[j][r-1]=trackerF_Ask[r];
-            }
-        }
-        
-        // 3.6: Fill Total Path Matrix and Export prices to csv
-        //ofstream mytotalpriceF;
-        //mytotalpriceF.open ("pricesF"+indexF+".csv");
-        for (int m=0; m<row; m++){
-            for (int n=0; n<col; n++){
-                totalprices[j][m][n]=matrixF[m][n];
-                //mytotalpriceF << totalprices[j][m][n]<<",";
-            }
-            //mytotalpriceF<<"\n";
-        }
-        //mytotalpriceF.close();
-        
-        
-    } // Close the loop for all months ----------------------------------------------------------------------------------------
+	for (int j = start; j < number; j++) {
+		// forwards part -------------------------------------------------------------------------
+		// 3.1: Create a matrix to store prices
+		matrixF = new float*[row];
+		for (int i = 0; i < row; ++i) {
+			matrixF[i] = new float[col];
+		}
+
+		// 3.2: Fill the matrix with zeros
+		for (int i = 0; i < row; i++) {
+			for (int k = 0; k < col; k++) {
+				matrixF[i][k] = 0;
+			}
+		}
+
+		// 3.3: Initialize the month matrix index counter
+		for (int r = 0; r < number; r++) {
+			monthindexF[r] = 0;
+			trackerF_Bid[r] = "";
+			trackerF_Ask[r] = "";
+		}
+
+		// 3.4: Call function "constructPaths"
+		string indexF;
+		indexF = to_string(j + 1);
+
+		clock_t forward_start = clock();
+
+		forwards(j, number);
+
+		clock_t forward_end = clock();
+		double forward_time = (forward_end - forward_start) / (double)CLOCKS_PER_SEC;
+		cout << "forward time: " << forward_time << endl;
+
+		// 3.5: Fill Total Path Matrix and Tracker Matrix
+		for (int r = 1; r < number; r++) {
+			totalpathsF[r - 1][j] = monthindexF[r];
+			if (atof(outrightF[j]) > 0) {
+				//cout << "j: " << j << " " << outrightF[j] << endl;
+				trackerMatrixF_Bid[j][r - 1] = trackerF_Bid[r];
+				trackerMatrixF_Ask[j][r - 1] = trackerF_Ask[r];
+			}
+		}
+
+		// 3.6: Fill Max and Min Price Matrix.It starts in j + 1 because the first row is for the max / min of the maxs / mins of each column
+		float auxMaxF = 0;
+		float auxMinF = 1000;
+
+		for (int n = 0; n < col; n++) {
+			for (int m = 0; m < row; m++) {
+				if (matrixF[m][n] > auxMaxF) {
+					auxMaxF = matrixF[m][n];
+				}
+				if (matrixF[m][n]  < auxMinF && matrixF[m][n]) {
+					auxMinF = matrixF[m][n];
+				}
+			}
+			maxPricesF[j + 1][n] = auxMaxF;
+			auxMaxF = 0;
+			minPricesF[j + 1][n] = auxMinF;
+			auxMinF = 1000;
+		}
+
+		for (int m = 0; m < row; m++) {
+			delete[] matrixF[m];
+		}
+		delete[] matrixF;
+
+
+		// backwards part-----------------------------------------------------------------------------------------
+		// 3.1: Create a matrix to store prices
+		matrixB = new float*[row];
+		for (int i = 0; i < row; ++i) {
+			matrixB[i] = new float[col];
+		}
+
+		// 3.2: Fill the matrix with zeros
+		for (int i = 0; i<row; i++) {
+			for (int k = 0; k<col; k++) {
+				matrixB[i][k] = 0;
+			}
+		}
+
+		// 3.3: Initialize the month matrix index counter
+		for (int r = 0; r<number; r++) {
+			monthindexB[r] = 0;
+			trackerB_Bid[r] = "";
+			trackerB_Ask[r] = "";
+		}
+
+		// 3.4: Call function "constructPaths"
+		string indexB;
+		indexB = to_string(j + 1);
+
+
+		clock_t backward_start = clock();
+		backwards(j, number);
+		clock_t backward_end = clock();
+		double backward_time = (backward_end - backward_start) / (double)CLOCKS_PER_SEC;
+		cout << "backward time: " << backward_time << endl;
+
+
+		// 3.5: Fill Total Path Matrix and Tracker Matrix
+		for (int r = 1; r<number; r++) {
+			totalpathsB[r - 1][j] = monthindexB[r];
+			if (outrightB[j]>0) {
+				//cout << "j: " << j << " " << outrightB[j] << endl;
+				trackerMatrixB_Bid[j][r - 1] = trackerB_Bid[r];
+				trackerMatrixB_Ask[j][r - 1] = trackerB_Ask[r];
+			}
+		}
+
+		// 3.6: Fill Max and Min Price Matrix.It starts in j + 1 because the first row is for the max / min of the maxs / mins of each column
+		float auxMaxB = 0;
+		float auxMinB = 1000;
+
+		for (int n = 0; n<col; n++) {
+			for (int m = 0; m<row; m++) {
+				if (matrixB[m][n]>auxMaxB) {
+					auxMaxB = matrixB[m][n];
+				}
+				if (matrixB[m][n]<auxMinB && matrixB[m][n]>0) {
+					auxMinB = matrixB[m][n];
+				}
+			}
+			maxPricesB[j + 1][n] = auxMaxB;
+			auxMaxB = 0;
+			minPricesB[j + 1][n] = auxMinB;
+			auxMinB = 1000;
+		}
+
+
+		for (int m = 0; m < row; m++) {
+			delete[] matrixB[m];
+		}
+		delete[] matrixB;
+
+	}
+        // Close the loop for all months ----------------------------------------------------------------------------------------
     
-    
-    // 4: Export Total Paths Forwards to csv
-    /*
-    ofstream mytotalpathF;
-    mytotalpathF.open ("totalpathF.csv");
-    for (int m=0; m<number; m++){
-        for (int n=0; n<number; n++){
-            mytotalpathF << totalpathsF[m][n]<<",";
-        }
-        mytotalpathF<<"\n";
-    }
-    mytotalpathF.close();
-    */
-    // Total Paths exported ---------------------------------------------------------------------------------------------------
-    
-    
+
+
+	clock_t calTime = clock();
+	clock_t part2_time = calTime - readTime;
+	double time_2 = part2_time / (double)CLOCKS_PER_SEC;
+	cout << "time for calculating: " << time_2 << endl;
+
+
+
+
+
+
+	// All the exporting --------------------------------------------------------------------------------
     // 5: Export Tracker Bid and Ask to csv
     
     ofstream mytrackerF_Bid;
@@ -376,32 +465,11 @@ int main ()
         mytrackerF_Ask<<"\n";
     }
     mytrackerF_Ask.close();
-    
+
     // Tracker exported ---------------------------------------------------------------------------------------------------
     
     
     // 6: Max Price Matrix
-    // 6.1: Fill Max and Min Price Matrix. It starts in j+1 because the first row is for the max/min of the maxs/mins of each column
-    
-    float auxMaxF=0;
-    float auxMinF=1000;
-    
-    for (int j=0; j<number; j++){
-        for (int n=0; n<col; n++){
-            for (int m=0; m<row; m++){
-                if(totalprices[j][m][n]>auxMaxF){
-                    auxMaxF=totalprices[j][m][n];
-                }
-                if(totalprices[j][m][n]<auxMinF && totalprices[j][m][n]>0){
-                    auxMinF=totalprices[j][m][n];
-                }
-            }
-            maxPricesF[j+1][n]=auxMaxF;
-            auxMaxF=0;
-            minPricesF[j+1][n]=auxMinF;
-            auxMinF=1000;
-        }
-    }
     // 6.2: The Max of Maxs and Min of the Mins
     float auxMaxMax=0;
     float auxMinMin=1000;
@@ -420,7 +488,8 @@ int main ()
         minPricesF[0][j]=auxMinMin;
         auxMinMin=1000;
     }
-    
+
+
     // 6.3: Export Max and Min Prices to csv
     ofstream mymaxpriceF;
     mymaxpriceF.open ("maxpriceF.csv");
@@ -443,10 +512,10 @@ int main ()
     myminpriceF.close();
     
     // Forwards Ends!! ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    
+
     
     // 3b: Loop: for all starting months Backwards: ----------------------------------------------------------------------------
-    
+    /*
     cout << "Pasamos a Backwards" << endl;
     
     for (int j=start; j<number; j++){
@@ -488,36 +557,32 @@ int main ()
             }
         }
         
-        // 3.6: Fill Total Path Matrix and Export prices to csv
-        //ofstream mytotalpriceB;
-        //mytotalpriceB.open ("pricesB"+indexB+".csv");
-        for (int m=0; m<row; m++){
-            for (int n=0; n<col; n++){
-                totalprices[j][m][n]=matrixB[m][n];
-                //mytotalpriceB << totalprices[j][m][n]<<",";
-            }
-            //mytotalpriceB<<"\n";
-        }
-        //mytotalpriceB.close();
-        
+		// 3.6: Fill Max and Min Price Matrix.It starts in j + 1 because the first row is for the max / min of the maxs / mins of each column
+		float auxMaxB = 0;
+		float auxMinB = 1000;
+
+		for (int n = 0; n<col; n++) {
+			for (int m = 0; m<row; m++) {
+				if (matrixB[m][n]>auxMaxB) {
+					auxMaxB = matrixB[m][n];
+				}
+				if (matrixB[m][n]<auxMinB && matrixB[m][n]>0) {
+					auxMinB = matrixB[m][n];
+				}
+			}
+			maxPricesB[j + 1][n] = auxMaxB;
+			auxMaxB = 0;
+			minPricesB[j + 1][n] = auxMinB;
+			auxMinB = 1000;
+		}
+
+		for (int m = 0; m < row; m++) {
+			delete[] matrixB[m];
+		}
+		delete[] matrixB;
         
     } // Close the loop for all months ----------------------------------------------------------------------------------------
-    
-    
-    // 4: Export Total Paths Backwards to csv
-    /*
-     ofstream mytotalpathB;
-     mytotalpathB.open ("totalpathB.csv");
-     for (int m=0; m<number; m++){
-        for (int n=0; n<number; n++){
-            mytotalpathB << totalpathsB[m][n]<<",";
-        }
-        mytotalpathB<<"\n";
-     }
-     mytotalpathB.close();
-     */
-    // Total Paths exported ---------------------------------------------------------------------------------------------------
-    
+    */
     
     // 5: Export Trackers to csv
     
@@ -542,29 +607,10 @@ int main ()
     mytrackerB_Ask.close();
     
     // Tracker exported ---------------------------------------------------------------------------------------------------
-    
+
     
     // 6: Max Price Matrix
-    // 6.1: Fill Max Price Matrix. It starts in j+1 because the first row is for the max of the maxs of each column
-    float auxMaxB=0;
-    float auxMinB=1000;
-    
-    for (int j=0; j<number; j++){
-        for (int n=0; n<col; n++){
-            for (int m=0; m<row; m++){
-                if(totalprices[j][m][n]>auxMaxB){
-                    auxMaxB=totalprices[j][m][n];
-                }
-                if(totalprices[j][m][n]<auxMinB && totalprices[j][m][n]>0){
-                    auxMinB=totalprices[j][m][n];
-                }
-            }
-            maxPricesB[j+1][n]=auxMaxB;
-            auxMaxB=0;
-            minPricesB[j+1][n]=auxMinB;
-            auxMinB=1000;
-        }
-    }
+
     // 6.2: The Max of Maxs and the Min of the Mins
     float auxMaxMaxB=0;
     float auxMinMinB=1000;
@@ -608,6 +654,17 @@ int main ()
     myminpriceB.close();
     
     // Backwards Ends!!---------------------------------------------------------------------------------------------------------
+
+	clock_t writeTime = clock();
+	clock_t part3_time = writeTime - calTime;
+	double time_3 = part3_time / (double)CLOCKS_PER_SEC;
+	cout << "time for calculating max & writing: " << time_3 << endl;
+
+	double overallt = (writeTime - startTime) / (double)CLOCKS_PER_SEC;
+	cout << "overall time: " << overallt << endl;
+
+
+	system("pause");
     
     return 0;
     
@@ -628,7 +685,7 @@ void forwards(int start, int number){
     for (int i=(start+1); i<number; i++){
         
         // 1 Month
-        if(i%3>0 & i%6>0 & i%12>0){
+        if(i%3>0 && i%6>0 && i%12>0){
             
             for(int j=0; j<monthindexF[i-1]; j++){
                 matrixF[j][i]=matrixF[j][i-1]-atof(onemonthF[i-1]);
